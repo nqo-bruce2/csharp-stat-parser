@@ -53,15 +53,15 @@
   <ItemGroup>
     <Compile Include="PlayerStatObjects\PlayerBadStats.cs" />
     <Compile Include="PlayerStatObjects\PlayerEfficiencyStats.cs" />
-    <Compile Include="PlayerStatObjects\PlayerKStats.cs" />
+    <Compile Include="PlayerStatObjects\PlayerKillStats.cs" />
     <Compile Include="PlayerStatObjects\PlayerQuadStats.cs" />
     <Compile Include="PlayerStatObjects\PlayerStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatGroups\BadStats.cs" />
     <Compile Include="StatGroups\EfficiencyStats.cs" />
-    <Compile Include="StatGroups\KStats.cs" />
-    <Compile Include="StatGroups\QStats.cs" />
+    <Compile Include="StatGroups\KillStats.cs" />
+    <Compile Include="StatGroups\QuadStats.cs" />
     <Compile Include="StatGroups\Stats.cs" />
     <Compile Include="Statistics.cs" />
   </ItemGroup>

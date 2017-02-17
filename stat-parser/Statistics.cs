@@ -13,9 +13,9 @@ namespace ConsoleApplication3
         public string MatchType { get; set; }
         public int PlayerCount { get; set; }
         public Stats Stats { get; set; }
-        public QStats QStats { get; set; }
+        public QuadStats QStats { get; set; }
         public BadStats BadStats { get; set; }
         public EfficiencyStats EfficiencyStats { get; set; }
-        public KStats KStats { get; set; }
+        public KillStats KStats { get; set; }
     }
 }

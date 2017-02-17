@@ -10,9 +10,9 @@ namespace ConsoleApplication3.PlayerStatObjects
     {
         public string Name { get; set; }
         public int Quads { get; set; }
-        public string Q_eff { get; set; }
-        public int Q_E_K { get; set; }
-        public int Q_Self_K { get; set; }
-        public int Q_Team_K { get; set; }
+        public string Quad_Eff { get; set; }
+        public int Quad_Enemy_Kills { get; set; }
+        public int Quad_Self_Kills { get; set; }
+        public int Quad_Team_Kills { get; set; }
     }
 }

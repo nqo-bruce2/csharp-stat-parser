@@ -7,13 +7,13 @@ using ConsoleApplication3.PlayerStatObjects;
 
 namespace ConsoleApplication3.StatGroups
 {
-    public class KStats
+    public class KillStats
     {
-        public List<PlayerKStats> Players { get; set; }
+        public List<PlayerKillStats> Players { get; set; }
 
-        public KStats()
+        public KillStats()
         {
-            Players = new List<PlayerKStats>();
+            Players = new List<PlayerKillStats>();
         }
     }
 }

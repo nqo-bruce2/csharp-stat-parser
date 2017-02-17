@@ -10,7 +10,7 @@ namespace ConsoleApplication3
     {
         public string Name { get; set; }
         public string Team { get; set; }
-        public string K_Eff { get; set; }
-        public string W_Eff { get; set; }       
+        public string Kill_Eff { get; set; }
+        public string Weapon_Eff { get; set; }       
     }
 }

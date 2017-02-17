@@ -9,7 +9,7 @@ namespace ConsoleApplication3.PlayerStatObjects
     public class PlayerEfficiencyStats
     {
         public string Name { get; set; }
-        public string Bull_Eff { get; set; }
+        public string Bullet_Eff { get; set; }
         public string Nails_Eff { get; set; }
         public string Rocket_Eff { get; set; }
         public string Lightning_Eff { get; set; }
