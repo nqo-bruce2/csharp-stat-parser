@@ -1,1 +1,0 @@
-C:\_dev\csharp-stat-parser\stat-parser\bin\Debug\stat-parser.exe.config

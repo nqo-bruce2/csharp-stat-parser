@@ -14,7 +14,12 @@ namespace ConsoleApplication3
 {
     class Program
     {
-        public static Statistics MStats;
+        public static Statistics MatchStatistics;
+        private const int MATCH_STATS_INDEX = 2;
+        private const int QUAD_STATS_INDEX = 3;
+        private const int BAD_STATS_INDEX = 4;
+        private const int EFFICIENCY_STATS_INDEX = 5;
+        private const int KILL_STATS_INDEX = 6;
         static void Main(string[] args)
         {
             Run();         
@@ -57,23 +62,23 @@ namespace ConsoleApplication3
         {
             try
             {
-                MStats = new Statistics();
-                MStats.MatchId = new Guid().ToString();
+                MatchStatistics = new Statistics();
+                MatchStatistics.MatchId = Guid.NewGuid().ToString();
                 //var text = File.ReadAllText("C:\\Users\\user\\Downloads\\match_stats_example.txt");
                 var text = File.ReadAllText(e.FullPath);
                 string pattern = "\r\n\r\n";
                 string[] substrings = Regex.Split(text, pattern, RegexOptions.Singleline);
-                ProcessStats(substrings[2]);
-                ProcessQStats(substrings[3]);
-                ProcessBadStats(substrings[4]);
-                ProcessEfficiencyStats(substrings[5]);
-                ProcessKStats(substrings[6]);
-                var jsonString = JsonConvert.SerializeObject(MStats);
+                ProcessStats(substrings[MATCH_STATS_INDEX]);
+                ProcessQStats(substrings[QUAD_STATS_INDEX]);
+                ProcessBadStats(substrings[BAD_STATS_INDEX]);
+                ProcessEfficiencyStats(substrings[EFFICIENCY_STATS_INDEX]);
+                ProcessKillStats(substrings[KILL_STATS_INDEX]);
+                var jsonString = JsonConvert.SerializeObject(MatchStatistics);
                 Console.WriteLine(jsonString);
                 //Do persistence, file temporarily
                 var CurrentDir = Environment.CurrentDirectory;
                 var ParentDir = Directory.GetParent(CurrentDir);
-                File.WriteAllText(Environment.CurrentDirectory + "/" + MStats.MatchId + ".json", jsonString);
+                File.WriteAllText(Environment.CurrentDirectory + "/" + MatchStatistics.MatchId + ".json", jsonString);
     
             }
             catch (Exception ex)
@@ -89,35 +94,35 @@ namespace ConsoleApplication3
     
         public static void ProcessStats(String s)
         {
-            MStats.Stats = new Stats();
+            MatchStatistics.Stats = new Stats();
             var statsData = s.Split(new string[] {"\r\n"}, StringSplitOptions.None);
             // Check if player count is uneven and throw exception if so.
             if (statsData.Length % 2 != 0)
                 throw new Exception("Odd number of players. Rage quit must have occured. Is omi, bib, ck1, dave/pete playing?");
             // Determine match type by counting num of players. Work around until this can be done server side. 
             if (statsData.Length == 4)
-                MStats.MatchType = "1v1";
+                MatchStatistics.MatchType = "1v1";
             if (statsData.Length == 6)
-                MStats.MatchType = "2v2";
+                MatchStatistics.MatchType = "2v2";
             if (statsData.Length == 8)
-                MStats.MatchType = "3v3";
+                MatchStatistics.MatchType = "3v3";
             if (statsData.Length == 10)
-                MStats.MatchType = "4v4";
+                MatchStatistics.MatchType = "4v4";
             for (int i = 2; i < statsData.Length; i++)
             {
                 var pdata = statsData[i].Split('|');
                 PlayerStats p = new PlayerStats();
                 p.Name = pdata[0].Trim();
                 p.Team = pdata[1].Trim();
-                p.K_Eff = pdata[2].Trim();
-                p.W_Eff = pdata[3].Trim();
-                MStats.Stats.Players.Add(p);
+                p.Kill_Eff = pdata[2].Trim();
+                p.Weapon_Eff = pdata[3].Trim();
+                MatchStatistics.Stats.Players.Add(p);
             }
         }
 
         public static void ProcessQStats(String s)
         {
-            MStats.QStats = new QStats();
+            MatchStatistics.QStats = new QuadStats();
             var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
             for (int i = 2; i < statsData.Length; i++)
             {
@@ -125,17 +130,17 @@ namespace ConsoleApplication3
                 PlayerQuadStats p = new PlayerQuadStats();
                 p.Name = pdata[0].Trim();
                 p.Quads = Convert.ToInt32(pdata[1].Trim());
-                p.Q_eff = pdata[2].Trim();
-                p.Q_E_K = Convert.ToInt32(pdata[3].Trim());
-                p.Q_Self_K = Convert.ToInt32(pdata[4].Trim());
-                p.Q_Team_K = Convert.ToInt32(pdata[5].Trim());
-                MStats.QStats.Players.Add(p);
+                p.Quad_Eff = pdata[2].Trim();
+                p.Quad_Enemy_Kills = Convert.ToInt32(pdata[3].Trim());
+                p.Quad_Self_Kills = Convert.ToInt32(pdata[4].Trim());
+                p.Quad_Team_Kills = Convert.ToInt32(pdata[5].Trim());
+                MatchStatistics.QStats.Players.Add(p);
             }
         }
 
         private static void ProcessBadStats(string s)
         {
-            MStats.BadStats = new BadStats();
+            MatchStatistics.BadStats = new BadStats();
             var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
             for (int i = 2; i < statsData.Length; i++)
             {
@@ -145,43 +150,43 @@ namespace ConsoleApplication3
                 p.Dropped_Paks = Convert.ToInt32(pdata[1].Trim());
                 p.Self_Damage = pdata[2].Trim();
                 p.Team_Damage = pdata[3].Trim();
-                MStats.BadStats.Players.Add(p);
+                MatchStatistics.BadStats.Players.Add(p);
             }
         }
 
         private static void ProcessEfficiencyStats(string s)
         {
-            MStats.EfficiencyStats = new EfficiencyStats();
+            MatchStatistics.EfficiencyStats = new EfficiencyStats();
             var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
             for (int i = 2; i < statsData.Length; i++)
             {
                 var pdata = statsData[i].Split('|');
                 PlayerEfficiencyStats p = new PlayerEfficiencyStats();
                 p.Name = pdata[0].Trim();
-                p.Bull_Eff = pdata[1].Trim();
+                p.Bullet_Eff = pdata[1].Trim();
                 p.Nails_Eff = pdata[2].Trim();
                 p.Rocket_Eff = pdata[3].Trim();
                 p.Lightning_Eff = pdata[4].Trim();
                 p.Total_Eff = pdata[5].Trim();
-                MStats.EfficiencyStats.Players.Add(p);
+                MatchStatistics.EfficiencyStats.Players.Add(p);
             }
         }
 
-        private static void ProcessKStats(string s)
+        private static void ProcessKillStats(string s)
         {
-            MStats.KStats = new KStats();
+            MatchStatistics.KStats = new KillStats();
             var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
             for (int i = 2; i < statsData.Length; i++)
             {
                 var pdata = statsData[i].Split('|');
-                PlayerKStats p = new PlayerKStats();
+                PlayerKillStats p = new PlayerKillStats();
                 p.Name = pdata[0].Trim();
                 p.Frag_Count = Convert.ToInt32(pdata[1].Trim());
-                p.E_Count = Convert.ToInt32(pdata[2].Trim());
-                p.Self_Count = Convert.ToInt32(pdata[3].Trim());
-                p.Team_count = Convert.ToInt32(pdata[4].Trim());
-                p.K_count = Convert.ToInt32(pdata[5].Trim());
-                MStats.KStats.Players.Add(p);
+                p.Enemy_Kill_Count = Convert.ToInt32(pdata[2].Trim());
+                p.Self_Kill_Count = Convert.ToInt32(pdata[3].Trim());
+                p.Team_Kill_Count = Convert.ToInt32(pdata[4].Trim());
+                p.Killed_Count = Convert.ToInt32(pdata[5].Trim());
+                MatchStatistics.KStats.Players.Add(p);
             }
         }
     }

@@ -3,11 +3,11 @@ using ConsoleApplication3.PlayerStatObjects;
 
 namespace ConsoleApplication3.StatGroups
 {
-    public class QStats
+    public class QuadStats
     {
         public List<PlayerQuadStats> Players { get; set; }
 
-        public QStats()
+        public QuadStats()
         {
             Players = new List<PlayerQuadStats>();
         }

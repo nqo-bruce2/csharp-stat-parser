@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace ConsoleApplication3.PlayerStatObjects
 {
-    public class PlayerKStats
+    public class PlayerKillStats
     {
         public string Name { get; set; }
         public int Frag_Count { get; set; }
-        public int E_Count { get; set; }
-        public int Self_Count { get; set; }
-        public int Team_count { get; set; }
-        public int K_count { get; set; }
+        public int Enemy_Kill_Count { get; set; }
+        public int Self_Kill_Count { get; set; }
+        public int Team_Kill_Count { get; set; }
+        public int Killed_Count { get; set; }
     }
 }
