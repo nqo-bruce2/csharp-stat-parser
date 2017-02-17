@@ -59,7 +59,7 @@ namespace ConsoleApplication3
             {
                 MStats = new Statistics();
                 MStats.MatchId = new Guid().ToString();
-                //var text = File.ReadAllText("C:\\Users\\brxb\\Downloads\\match_stats_example.txt");
+                //var text = File.ReadAllText("C:\\Users\\user\\Downloads\\match_stats_example.txt");
                 var text = File.ReadAllText(e.FullPath);
                 string pattern = "\r\n\r\n";
                 string[] substrings = Regex.Split(text, pattern, RegexOptions.Singleline);
@@ -92,7 +92,7 @@ namespace ConsoleApplication3
             MStats.Stats = new Stats();
             var statsData = s.Split(new string[] {"\r\n"}, StringSplitOptions.None);
             // Check if player count is uneven and throw exception if so.
-            if (statsData.Length % 2 != 1)
+            if (statsData.Length % 2 != 0)
                 throw new Exception("Odd number of players. Rage quit must have occured. Is omi, bib, ck1, dave/pete playing?");
             // Determine match type by counting num of players. Work around until this can be done server side. 
             if (statsData.Length == 4)
