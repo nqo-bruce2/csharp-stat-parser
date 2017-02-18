@@ -1,11 +1,11 @@
-﻿using System;
+﻿using stat_parser.StatGroups;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ConsoleApplication3.StatGroups;
 
-namespace ConsoleApplication3
+namespace stat_parser
 {
     public class Statistics
     {

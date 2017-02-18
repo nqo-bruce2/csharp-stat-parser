@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApplication3.PlayerStatObjects
+namespace stat_parser.PlayerStatObjects
 {
     public class PlayerBadStats
     {

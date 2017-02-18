@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using stat_parser.PlayerStatObjects;
+using System.Collections.Generic;
 
-namespace ConsoleApplication3.StatGroups
+namespace stat_parser.StatGroups
 {
     public class Stats
     {

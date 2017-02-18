@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using ConsoleApplication3.PlayerStatObjects;
-using ConsoleApplication3.StatGroups;
 using Newtonsoft.Json;
+using NLog;
+using stat_parser.PlayerStatObjects;
+using stat_parser.StatGroups;
 
-namespace ConsoleApplication3
+namespace stat_parser
 {
     class Program
     {
         public static Statistics MatchStatistics;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private const int MATCH_STATS_INDEX = 2;
         private const int QUAD_STATS_INDEX = 3;
         private const int BAD_STATS_INDEX = 4;
@@ -22,6 +19,7 @@ namespace ConsoleApplication3
         private const int KILL_STATS_INDEX = 6;
         static void Main(string[] args)
         {
+            logger.Info("starting stat parser - looking for file...");
             Run();         
         }
 
