@@ -1,80 +1,33 @@
-﻿using System;
-using System.IO;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
 using stat_parser.PlayerStatObjects;
 using stat_parser.StatGroups;
+using System;
 using System.Configuration;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace stat_parser
 {
-    class Program
+    public class StatProcessor
     {
-        private static readonly string DirectoryToWatch = ConfigurationManager.AppSettings["UnprocessedDirectory"];
+        public static Statistics MatchStatistics;
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        /*public static Statistics MatchStatistics;
+        private static readonly string ProcessedDirectory = ConfigurationManager.AppSettings["ProcessedDirectory"];
+        private static readonly string ErrorDirectory = ConfigurationManager.AppSettings["ErrorDirectory"];
         private const int MATCH_STATS_INDEX = 2;
         private const int QUAD_STATS_INDEX = 3;
         private const int BAD_STATS_INDEX = 4;
         private const int EFFICIENCY_STATS_INDEX = 5;
         private const int KILL_STATS_INDEX = 6;
-        */
-        static void Main(string[] args)
+
+        public void StartParsing(string fileName, string fileToParse)
         {
-            logger.Info("starting stat parser - looking for file...");
-            Run();         
-        }
-
-        public static void Run()
-        {
-            string[] args = System.Environment.GetCommandLineArgs();
-
-            // If a directory is not specified, exit program.
-            /*if (args.Length != 2)
-            {
-                // Display the proper way to call the program.
-                Console.WriteLine("Usage: Watcher.exe (directory)");
-                return;
-            }*/
-            // Create a new FileSystemWatcher and set its properties.
-            FileSystemWatcher watcher = new FileSystemWatcher();
-            if (!Directory.Exists(DirectoryToWatch))
-            {
-                logger.Error("Directory not found: " + DirectoryToWatch);
-                throw new DirectoryNotFoundException("Directory not found: " + DirectoryToWatch);
-            }
-            watcher.Path = DirectoryToWatch;
-
-            /* Watch for changes in LastAccess and LastWrite times, and
-               the renaming of files or directories. */
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            // Only watch text files.
-            watcher.Filter = "*.txt";
-
-            // Add event handlers.
-            watcher.Created += new FileSystemEventHandler(OnChanged);
-
-            // Begin watching.
-            watcher.EnableRaisingEvents = true;
-
-            // Wait for the user to quit the program.
-            Console.WriteLine("Press \'q\' to quit the sample.");
-            while (Console.Read() != 'q') ;
-        }
-
-        // Define the event handlers.
-        private static void OnChanged(object source, FileSystemEventArgs e)
-        {
-            StatProcessor processor = new StatProcessor();
-            processor.StartParsing(e.Name, e.FullPath);
-            /*try
+            try
             {
                 MatchStatistics = new Statistics();
                 MatchStatistics.MatchId = Guid.NewGuid().ToString();
-                //var text = File.ReadAllText("C:\\Users\\user\\Downloads\\match_stats_example.txt");
-                var text = File.ReadAllText(e.FullPath);
+                var text = File.ReadAllText(fileToParse);
                 string pattern = "\r\n\r\n";
                 string[] substrings = Regex.Split(text, pattern, RegexOptions.Singleline);
                 ProcessStats(substrings[MATCH_STATS_INDEX]);
@@ -85,25 +38,22 @@ namespace stat_parser
                 var jsonString = JsonConvert.SerializeObject(MatchStatistics);
                 Console.WriteLine(jsonString);
                 //Do persistence, file temporarily
-                var CurrentDir = Environment.CurrentDirectory;
-                var ParentDir = Directory.GetParent(CurrentDir);
-                File.WriteAllText(Environment.CurrentDirectory + "/" + MatchStatistics.MatchId + ".json", jsonString);
-    
+                File.WriteAllText(ProcessedDirectory + "\\" + MatchStatistics.MatchId + ".json", jsonString);
+                //Move file
+                File.Move(fileToParse, ProcessedDirectory + "\\" + fileName);
+
             }
             catch (Exception ex)
             {
-                var CurrentDir = Environment.CurrentDirectory;
-                var ParentDir = Directory.GetParent(CurrentDir);
-                //File.WriteAllText(ParentDir + "/error/" + MStats.MatchId + ".json", jsonString);
-                File.Move(e.FullPath, ParentDir + "/error/" + e.Name);
-            }*/
-
+                logger.Error("Exception during processing: " + ex.ToString());
+                File.Move(fileToParse, ErrorDirectory + "\\" + fileName);
+            }
         }
-        /*
+
         public static void ProcessStats(String s)
         {
             MatchStatistics.Stats = new Stats();
-            var statsData = s.Split(new string[] {"\r\n"}, StringSplitOptions.None);
+            var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
             // Check if player count is uneven and throw exception if so.
             if (statsData.Length % 2 != 0)
                 throw new Exception("Odd number of players. Rage quit must have occured. Is omi, bib, ck1, dave/pete playing?");
@@ -196,6 +146,6 @@ namespace stat_parser
                 p.Killed_Count = Convert.ToInt32(pdata[5].Trim());
                 MatchStatistics.KStats.Players.Add(p);
             }
-        }*/
+        }
     }
 }

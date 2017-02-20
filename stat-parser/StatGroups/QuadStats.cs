@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using ConsoleApplication3.PlayerStatObjects;
+﻿using stat_parser.PlayerStatObjects;
+using System.Collections.Generic;
 
-namespace ConsoleApplication3.StatGroups
+namespace stat_parser.StatGroups
 {
     public class QuadStats
     {

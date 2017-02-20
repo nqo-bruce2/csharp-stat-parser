@@ -1,11 +1,11 @@
-﻿using System;
+﻿using stat_parser.PlayerStatObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ConsoleApplication3.PlayerStatObjects;
 
-namespace ConsoleApplication3.StatGroups
+namespace stat_parser.StatGroups
 {
     public class BadStats
     {
