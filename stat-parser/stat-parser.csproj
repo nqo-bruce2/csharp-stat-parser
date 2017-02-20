@@ -84,6 +84,7 @@
     <Compile Include="StatGroups\QuadStats.cs" />
     <Compile Include="StatGroups\Stats.cs" />
     <Compile Include="Statistics.cs" />
+    <Compile Include="StatProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
