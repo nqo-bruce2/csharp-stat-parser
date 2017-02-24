@@ -11,6 +11,7 @@ namespace stat_parser
     {
         public string MatchId { get; set; }
         public string MatchType { get; set; }
+        public string MapName { get; set; }
         public int PlayerCount { get; set; }
         public Stats Stats { get; set; }
         public QuadStats QStats { get; set; }

@@ -1,17 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using Integration;
+using Models;
+using Newtonsoft.Json;
 using NLog;
 using stat_parser.PlayerStatObjects;
 using stat_parser.StatGroups;
 using System;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace stat_parser
 {
     public class StatProcessor
     {
-        public static Statistics MatchStatistics;
+        private static Statistics MatchStatistics;
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static readonly string ProcessedDirectory = ConfigurationManager.AppSettings["ProcessedDirectory"];
         private static readonly string ErrorDirectory = ConfigurationManager.AppSettings["ErrorDirectory"];
@@ -25,20 +28,24 @@ namespace stat_parser
         {
             try
             {
+                logger.Info("Starting Parsing........");
                 MatchStatistics = new Statistics();
-                MatchStatistics.MatchId = Guid.NewGuid().ToString();
+                MatchStatistics.MatchId = fileName;                
                 var text = File.ReadAllText(fileToParse);
+                // persist match and log contents before parsing as a backup of raw data
+                SaveMatchBeforeParsing(fileName, text);
+
                 string pattern = "\r\n\r\n";
                 string[] substrings = Regex.Split(text, pattern, RegexOptions.Singleline);
+                MatchStatistics.MapName = "temp";
                 ProcessStats(substrings[MATCH_STATS_INDEX]);
                 ProcessQStats(substrings[QUAD_STATS_INDEX]);
                 ProcessBadStats(substrings[BAD_STATS_INDEX]);
                 ProcessEfficiencyStats(substrings[EFFICIENCY_STATS_INDEX]);
                 ProcessKillStats(substrings[KILL_STATS_INDEX]);
-                var jsonString = JsonConvert.SerializeObject(MatchStatistics);
-                Console.WriteLine(jsonString);
-                //Do persistence, file temporarily
-                File.WriteAllText(ProcessedDirectory + "\\" + MatchStatistics.MatchId + ".json", jsonString);
+
+                //Do persistence
+                PersistMatchData(MatchStatistics);
                 //Move file
                 File.Move(fileToParse, ProcessedDirectory + "\\" + fileName);
 
@@ -48,6 +55,82 @@ namespace stat_parser
                 logger.Error("Exception during processing: " + ex.ToString());
                 File.Move(fileToParse, ErrorDirectory + "\\" + fileName);
             }
+        }
+
+        private void PersistMatchData(Statistics matchStatistics)
+        {
+            logger.Info("Saving all data to database");
+            using (var db = new StatsDbContext())
+            {
+                // update match details
+                var match = db.Match
+                    .Where(b => b.MatchId == MatchStatistics.MatchId)
+                    .FirstOrDefault();
+                match.MatchType = matchStatistics.MatchType;
+                match.MapName = matchStatistics.MapName;
+                db.SaveChanges();
+
+                // create player
+                foreach (var p in matchStatistics.Stats.Players)
+                {
+                    var playerId = 0;
+                    var playa = db.Player
+                        .Where(x => x.Name == p.Name)
+                        .FirstOrDefault();
+                    if (playa == null)
+                    {
+                        Random rnd = new Random();
+                        var newPlayer = new Player() { Name = p.Name, IpAddress = "0.0.0." + rnd.Next(0,250), Password = "pw", UserName = "uname" };
+                        db.Player.Add(newPlayer);
+                        db.SaveChanges();
+                        playerId = newPlayer.Id;
+                    }
+
+                    var mpStats = new MatchPlayerStats();
+                    mpStats.MatchId = match.Id;
+                    mpStats.PlayerId = playerId;
+                    // populate team stats
+                    mpStats.TeamColor = matchStatistics.Stats.Players.Single(x => x.Name == p.Name).Team;
+                    mpStats.KillEfficiency = matchStatistics.Stats.Players.Single(x => x.Name == p.Name).Kill_Eff;
+                    mpStats.WeaponEfficiency = matchStatistics.Stats.Players.Single(x => x.Name == p.Name).Weapon_Eff;
+                    // populate quad stats
+                    mpStats.NumberOfQuads = matchStatistics.QStats.Players.Single(x => x.Name == p.Name).Quads;
+                    mpStats.QuadEfficiency = matchStatistics.QStats.Players.Single(x => x.Name == p.Name).Quad_Eff;
+                    mpStats.NumQuadEnemyKills = matchStatistics.QStats.Players.Single(x => x.Name == p.Name).Quad_Enemy_Kills;
+                    mpStats.NumQuadSelfKills = matchStatistics.QStats.Players.Single(x => x.Name == p.Name).Quad_Self_Kills;
+                    mpStats.NumQuadTeamKills = matchStatistics.QStats.Players.Single(x => x.Name == p.Name).Quad_Team_Kills;
+                    // populate kill stats
+                    mpStats.NumOfFrags = matchStatistics.KStats.Players.Single(x => x.Name == p.Name).Frag_Count;
+                    mpStats.NumOfEnemyKills = matchStatistics.KStats.Players.Single(x => x.Name == p.Name).Enemy_Kill_Count;
+                    mpStats.NumOfSelfKills = matchStatistics.KStats.Players.Single(x => x.Name == p.Name).Self_Kill_Count;
+                    mpStats.NumOfTeamKills = matchStatistics.KStats.Players.Single(x => x.Name == p.Name).Team_Kill_Count;
+                    mpStats.NumOfDeaths = matchStatistics.KStats.Players.Single(x => x.Name == p.Name).Killed_Count;
+                    // populate efficiency stats
+                    mpStats.BulletEfficiency = matchStatistics.EfficiencyStats.Players.Single(x => x.Name == p.Name).Bullet_Eff;
+                    mpStats.NailsEfficiency = matchStatistics.EfficiencyStats.Players.Single(x => x.Name == p.Name).Nails_Eff;
+                    mpStats.RocketEfficiency = matchStatistics.EfficiencyStats.Players.Single(x => x.Name == p.Name).Rocket_Eff;
+                    mpStats.LightningEfficiency = matchStatistics.EfficiencyStats.Players.Single(x => x.Name == p.Name).Lightning_Eff;
+                    mpStats.TotalEfficiency = matchStatistics.EfficiencyStats.Players.Single(x => x.Name == p.Name).Total_Eff;
+                    // populate bad stats
+                    mpStats.DroppedPaks = matchStatistics.BadStats.Players.Single(x => x.Name == p.Name).Dropped_Paks;
+                    mpStats.SelfDamage = matchStatistics.BadStats.Players.Single(x => x.Name == p.Name).Self_Damage;
+                    mpStats.TeamDamage = matchStatistics.BadStats.Players.Single(x => x.Name == p.Name).Team_Damage;
+
+                    db.MatchPlayerStats.Add(mpStats);
+                    db.SaveChanges();
+                }
+            }
+        }
+
+        private void SaveMatchBeforeParsing(string fileName, string text)
+        {
+            logger.Info("Saving file before parsing");
+            using (var db = new StatsDbContext())
+            {
+                db.Match.Add(new Models.Match() { MatchId = fileName, MatchType = "", MapName = "", MatchText = text, Date = DateTime.Now });
+                db.SaveChanges();
+            }
+            
         }
 
         public static void ProcessStats(String s)
