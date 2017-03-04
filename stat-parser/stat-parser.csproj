@@ -88,7 +88,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrmodStatParser.cs" />
+    <Compile Include="DTO\MatchTeamStatDTO.cs" />
     <Compile Include="Integration\StatsDbContext.cs" />
+    <Compile Include="DTO\MatchPlayerDTO.cs" />
+    <Compile Include="DTO\MatchResultDTO.cs" />
     <Compile Include="Migrations\201702220904474_testsetup.cs" />
     <Compile Include="Migrations\201702220904474_testsetup.Designer.cs">
       <DependentUpon>201702220904474_testsetup.cs</DependentUpon>
@@ -105,24 +109,19 @@
     <Compile Include="Migrations\201702240722510_updateidcolumns.Designer.cs">
       <DependentUpon>201702240722510_updateidcolumns.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201703040611508_majorrefactor.cs" />
+    <Compile Include="Migrations\201703040611508_majorrefactor.Designer.cs">
+      <DependentUpon>201703040611508_majorrefactor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Match.cs" />
     <Compile Include="Models\MatchPlayerStats.cs" />
+    <Compile Include="Models\MatchTeamStats.cs" />
     <Compile Include="Models\Player.cs" />
-    <Compile Include="PlayerStatObjects\PlayerBadStats.cs" />
-    <Compile Include="PlayerStatObjects\PlayerEfficiencyStats.cs" />
-    <Compile Include="PlayerStatObjects\PlayerKillStats.cs" />
-    <Compile Include="PlayerStatObjects\PlayerQuadStats.cs" />
-    <Compile Include="PlayerStatObjects\PlayerStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StatGroups\BadStats.cs" />
-    <Compile Include="StatGroups\EfficiencyStats.cs" />
-    <Compile Include="StatGroups\KillStats.cs" />
-    <Compile Include="StatGroups\QuadStats.cs" />
-    <Compile Include="StatGroups\Stats.cs" />
-    <Compile Include="Statistics.cs" />
-    <Compile Include="StatProcessor.cs" />
+    <Compile Include="StatProcessorBase.cs" />
+    <Compile Include="Utils\StringExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -160,6 +159,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201702240722510_updateidcolumns.resx">
       <DependentUpon>201702240722510_updateidcolumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703040611508_majorrefactor.resx">
+      <DependentUpon>201703040611508_majorrefactor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -18,5 +18,6 @@ namespace Integration
         public DbSet<Match> Match { get; set; }
         public DbSet<Player> Player { get; set; }
         public DbSet<MatchPlayerStats> MatchPlayerStats { get; set; }
+        public DbSet<MatchTeamStats> MatchTeamStats { get; set; }
     }
 }

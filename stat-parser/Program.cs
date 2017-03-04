@@ -14,6 +14,7 @@ namespace stat_parser
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args)
         {
+
             logger.Info("starting stat parser - looking for file...");
             //using (var db = new StatsDbContext())
             //{
@@ -70,7 +71,8 @@ namespace stat_parser
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
             logger.Info("Found file: " + e.FullPath);
-            StatProcessor processor = new StatProcessor();
+            //StatProcessor processor = new StatProcessor();
+            StatProcessorBase processor = new CrmodStatParser();
             processor.StartParsing(e.Name, e.FullPath);
 
         }

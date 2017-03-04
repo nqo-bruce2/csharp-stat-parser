@@ -11,11 +11,11 @@ namespace Models
         public int PlayerId { get; set; }
         // begin skill stats
         public string TeamColor { get; set; }
-        public string KillEfficiency { get; set; }
-        public string WeaponEfficiency { get; set; }
+        public decimal? KillEfficiency { get; set; }
+        public decimal? WeaponEfficiency { get; set; }
         // begin quad stats
         public int NumberOfQuads { get; set; }
-        public string QuadEfficiency { get; set; }
+        public decimal? QuadEfficiency { get; set; }
         public int NumQuadEnemyKills { get; set; }
         public int NumQuadSelfKills { get; set; }
         public int NumQuadTeamKills { get; set; }
@@ -26,14 +26,14 @@ namespace Models
         public int NumOfTeamKills { get; set; }
         public int NumOfDeaths { get; set; }
         // begin efficiency stats
-        public string BulletEfficiency { get; set; }
-        public string NailsEfficiency { get; set; }
-        public string RocketEfficiency { get; set; }
-        public string LightningEfficiency { get; set; }
-        public string TotalEfficiency { get; set; }
+        public decimal? BulletEfficiency { get; set; }
+        public decimal? NailsEfficiency { get; set; }
+        public decimal? RocketEfficiency { get; set; }
+        public decimal? LightningEfficiency { get; set; }
+        public decimal? TotalEfficiency { get; set; }
         // begin bad stats
         public int DroppedPaks { get; set; }
-        public string SelfDamage { get; set; }
-        public string TeamDamage { get; set; }
+        public decimal? SelfDamage { get; set; }
+        public decimal? TeamDamage { get; set; }
     }
 }
