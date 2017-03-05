@@ -11,7 +11,8 @@ namespace stat_parser
     public class CrmodStatParser : StatProcessorBase
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        private const string PATTERN = "\r\n\r\n";
+        private const string PATTERN = "\n\n";
+        private const string LINE_SPLITTER = "\n";
         private string[] Substrings { get; set; }
         public MatchTeamStatDTO TeamOne { get; set; }
         public MatchTeamStatDTO TeamTwo { get; set; }
@@ -37,7 +38,9 @@ namespace stat_parser
             // grab team stats section
             var s = Substrings[TEAM_STATS_INDEX];
             // split lines
-            var data = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var data = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
+            logger.Debug("Processing Team Stats Details");
+            logger.Debug(data.ToString());
             var teamX = data[0].Split('|')[1].Trim();
             var teamY = data[0].Split('|')[2].Trim();
             // grab QUAD
@@ -90,16 +93,21 @@ namespace stat_parser
 
         private void ProcessHeader()
         {
+            logger.Debug("starting header");
+            logger.Debug("substrings length = " + Substrings.Length);
+
             // grab header text
             var s = Substrings[MATCH_HEADER_INDEX];
+            logger.Debug("header text = " + s);
             // split header lines
-            var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var statsData = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
+            logger.Debug("header details length = " + statsData.Length);
             // grab teams
-            TeamOne.TeamColor = statsData[1].Split(' ')[1];
-            TeamTwo.TeamColor = statsData[2].Split(' ')[1];
+            TeamOne.TeamColor = statsData[1].Split(new string[] { "The " }, StringSplitOptions.None)[1].Split(new string[] { "team" }, StringSplitOptions.None)[0].Trim(); ;
+            TeamTwo.TeamColor = statsData[2].Split(new string[] { "The " }, StringSplitOptions.None)[1].Split(new string[] { "team" }, StringSplitOptions.None)[0].Trim();
             // grab total frags
-            TeamOne.TeamTotalFrags = statsData[1].Split(' ')[4];
-            TeamTwo.TeamTotalFrags = statsData[2].Split(' ')[4];
+            TeamOne.TeamTotalFrags = statsData[1].Split(new string[] { "has " }, StringSplitOptions.None)[1].Split(new string[] { "f" }, StringSplitOptions.None)[0].Trim();
+            TeamTwo.TeamTotalFrags = statsData[2].Split(new string[] { "has " }, StringSplitOptions.None)[1].Split(new string[] { "f" }, StringSplitOptions.None)[0].Trim();
             // determine winner and loser
             if (TeamOne.TeamTotalFrags == TeamTwo.TeamTotalFrags)
             {
@@ -118,7 +126,7 @@ namespace stat_parser
             }
             MatchResults.ListOfTeams.Add(TeamOne.TeamColor, TeamOne);
             MatchResults.ListOfTeams.Add(TeamTwo.TeamColor, TeamTwo);
-
+            logger.Debug("ending header");
         }
 
         private void SetMatchType(string[] data)
@@ -149,9 +157,10 @@ namespace stat_parser
 
         internal override void ProcessStats()
         {
+            logger.Debug("starting skillstats");
             var s = Substrings[MATCH_STATS_INDEX];
             // split each player to process individually
-            var statsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var statsData = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
 
             SetMatchType(statsData);
 
@@ -173,6 +182,7 @@ namespace stat_parser
                 p.WeaponEfficiency = pdata[weaponEfficiency].Trim();
                 MatchResults.ListOfPlayers.Add(p.Name, p);
             }
+            logger.Debug("ending skillstats");
         }
 
         internal override void SplitMatchStats(string s)
@@ -195,7 +205,7 @@ namespace stat_parser
             var s = Substrings[QUAD_STATS_INDEX];
 
             // grab lines
-            var quadData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var quadData = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
 
             // iterate over players
             for (int i = 2; i < quadData.Length; i++)
@@ -223,7 +233,7 @@ namespace stat_parser
             var s = Substrings[BAD_STATS_INDEX];
 
             // grab lines
-            var badstatsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var badstatsData = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
 
             // iterate over players
             for (int i = 2; i < badstatsData.Length; i++)
@@ -251,7 +261,7 @@ namespace stat_parser
             var s = Substrings[EFFICIENCY_STATS_INDEX];
 
             // grab lines
-            var efficiencyData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var efficiencyData = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
 
             // iterate over players
             for (int i = 2; i < efficiencyData.Length; i++)
@@ -282,7 +292,7 @@ namespace stat_parser
             var s = Substrings[KILL_STATS_INDEX];
 
             // grab lines
-            var killstatsData = s.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var killstatsData = s.Split(new string[] { LINE_SPLITTER }, StringSplitOptions.None);
 
             // iterate over players
             for (int i = 2; i < killstatsData.Length; i++)

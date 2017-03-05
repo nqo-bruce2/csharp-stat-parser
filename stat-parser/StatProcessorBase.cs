@@ -54,13 +54,13 @@ namespace stat_parser
                 PersistMatchData();
 
                 //Move file once processed. 
-                File.Move(fileToParse, ProcessedDirectory + "\\" + fileName + DateTime.Now.Ticks + ".processed");
+                File.Move(fileToParse, ProcessedDirectory + "/" + fileName + DateTime.Now.Ticks + ".processed");
 
             }
             catch (Exception ex)
             {
+                File.Move(fileToParse, ErrorDirectory + "/" + fileName + DateTime.Now.Ticks + ".error");
                 logger.Error("Exception during processing: " + ex.ToString());
-                File.Move(fileToParse, ErrorDirectory + "\\" + fileName + "." + DateTime.Now.Ticks + ".processed");
             }
         }
 

@@ -16,15 +16,6 @@ namespace stat_parser
         {
 
             logger.Info("starting stat parser - looking for file...");
-            //using (var db = new StatsDbContext())
-            //{
-            //    //var match = db.Match
-            //    //    .Where(b => b.MatchId == "matchid")
-            //    //    .FirstOrDefault();
-            //    db.Match.Add(new Models.Match() { MatchId = "matchid", MatchType = "1v1", MapName = "dm3", MatchText = "lots of data", Date = DateTime.Now });
-            //    db.SaveChanges();
-            //}
-            //logger.Info("starting stat parser - looking for file...");
 
             Run();         
         }
@@ -58,6 +49,7 @@ namespace stat_parser
 
             // Add event handlers.
             watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Renamed += new RenamedEventHandler(OnRenamed);
 
             // Begin watching.
             watcher.EnableRaisingEvents = true;
@@ -67,14 +59,23 @@ namespace stat_parser
             while (Console.Read() != 'q') ;
         }
 
+        private static void OnRenamed(object sender, FileSystemEventArgs e)
+        {
+            logger.Info("\n\n-------------OnRenamed: Found file: " + e.FullPath + "--------------\n\n");
+            DoWork(e);
+        }
+
         // Define the event handlers.
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
-            logger.Info("Found file: " + e.FullPath);
-            //StatProcessor processor = new StatProcessor();
+            logger.Info("\n\n-------------OnCreated: Found file: " + e.FullPath + "--------------\n\n");
+            DoWork(e);
+        }
+
+        private static void DoWork(FileSystemEventArgs e)
+        {
             StatProcessorBase processor = new CrmodStatParser();
             processor.StartParsing(e.Name, e.FullPath);
-
         }
     }
 }
