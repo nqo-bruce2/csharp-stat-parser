@@ -16,6 +16,9 @@ namespace Utils
             if (str.EndsWith("%"))
                 str = str.TrimEnd(new char[] { '%' });
 
+            if (str.StartsWith("%"))
+                str = str.TrimStart(new char[] { '%' });
+
             decimal convertedValue;
             decimal.TryParse(str.Trim(), out convertedValue);
             return convertedValue/100M;
