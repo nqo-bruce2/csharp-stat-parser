@@ -14,7 +14,6 @@ namespace stat_parser
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args)
         {
-
             logger.Info("starting stat parser - looking for file...");
 
             Run();         

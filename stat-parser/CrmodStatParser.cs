@@ -80,11 +80,13 @@ namespace stat_parser
             MatchResults.ListOfTeams[teamX].TeamTotalGA = data[5].Split('|')[1].Split(':')[2].Trim();
             MatchResults.ListOfTeams[teamY].TeamTotalGA = data[5].Split('|')[2].Split(':')[2].Trim();
             // grab +RL
-            MatchResults.ListOfTeams[teamX].TeamPlusRLPack = data[6].Split('|')[1].Split(' ')[3].Trim();
-            MatchResults.ListOfTeams[teamY].TeamPlusRLPack = data[6].Split('|')[2].Split(' ')[3].Trim();
+            //MatchResults.ListOfTeams[teamX].TeamPlusRLPack = data[6].Split('|')[1].Split(' ')[3].Trim();
+            //MatchResults.ListOfTeams[teamY].TeamPlusRLPack = data[6].Split('|')[2].Split(' ')[3].Trim();
+            MatchResults.ListOfTeams[teamX].TeamPlusRLPack = data[6].Split('|')[1].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+            MatchResults.ListOfTeams[teamY].TeamPlusRLPack = data[6].Split('|')[2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim();
             // grab -RL
-            MatchResults.ListOfTeams[teamX].TeamMinusRLPack = data[6].Split('|')[1].Split(' ')[7].Trim();
-            MatchResults.ListOfTeams[teamY].TeamMinusRLPack = data[6].Split('|')[2].Split(' ')[7].Trim();
+            MatchResults.ListOfTeams[teamX].TeamMinusRLPack = data[6].Split('|')[1].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+            MatchResults.ListOfTeams[teamY].TeamMinusRLPack = data[6].Split('|')[2].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
             // grab CTRL
             MatchResults.ListOfTeams[teamX].TeamControlPercentage = data[7].Split('|')[1].Trim();
             MatchResults.ListOfTeams[teamY].TeamControlPercentage = data[7].Split('|')[2].Trim();
