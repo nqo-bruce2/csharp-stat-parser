@@ -11,6 +11,7 @@ namespace DTO
         public string MapName { get; set; }
         public DateTime MatchDate { get; set; }
         public string MatchText { get; set; }
+        public string MatchTimeLimit { get; set; }
         public Dictionary<string, MatchTeamStatDTO> ListOfTeams { get; set; }
         public Dictionary<string, MatchPlayerDTO> ListOfPlayers { get; set; }
 

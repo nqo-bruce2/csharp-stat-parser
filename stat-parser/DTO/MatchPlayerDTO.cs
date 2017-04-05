@@ -5,7 +5,9 @@ namespace DTO
     public class MatchPlayerDTO
     {
         // info
+        public string StatId { get; set; }
         public string IpAddress { get; set; }
+        public string Ping { get; set; }
         public string Name { get; set; }
         // begin skill stats
         public string TeamColor { get; set; }
