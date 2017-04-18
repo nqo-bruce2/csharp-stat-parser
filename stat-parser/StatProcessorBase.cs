@@ -87,11 +87,11 @@ namespace stat_parser
         private void SaveMatchBeforeParsing(string fileName, string text)
         {
             logger.Info("Saving initial match details");
-            //using (var db = new StatsDbContext())
-            //{
-            //    db.Match.Add(new Match() { MatchId = fileName, MatchType = "", MapName = "", MatchText = text, Date = MatchResults.MatchDate });
-            //    db.SaveChanges();
-            //}
+            using (var db = new StatsDbContext())
+            {
+                db.Match.Add(new Match() { MatchId = fileName, MatchType = "", MapName = "", MatchText = text, Date = MatchResults.MatchDate });
+                db.SaveChanges();
+            }
 
         }
 
@@ -110,7 +110,6 @@ namespace stat_parser
         /// </summary>
         private void PersistMatchData()
         {
-            throw new Exception("don't proceed");
             logger.Info("Saving all data to database");
             using (var db = new StatsDbContext())
             {
@@ -125,6 +124,7 @@ namespace stat_parser
                     .FirstOrDefault();
                 match.MatchType = MatchResults.MatchType;
                 match.MapName = MatchResults.MapName;
+                match.MatchTimeLimit = MatchResults.MatchTimeLimit.ConvertToInt();
                 db.SaveChanges();
 
                 // Save each individual team stats. 
@@ -159,57 +159,64 @@ namespace stat_parser
                 // add all player detailed stats
                 foreach (KeyValuePair<string, MatchPlayerDTO> playerEntry in MatchResults.ListOfPlayers)
                 {
-                    var playerId = 0;
-                    var playa = db.Player
-                        .Where(x => x.Name == playerEntry.Key)
-                        .FirstOrDefault();
-                    if (playa == null)
+
+                    var playerId = playerEntry.Key.ConvertToInt();
+                    var mpStats = new MatchPlayerStats();
+
+                    // Because I'm setting every unique non logged in player to an int < 0 in the dictionary, I basically check if this user is logged in.
+                    // Of course this could be handled more elagantly with a proper object but time is limited at the moment.
+                    // if the player in this entry is logged in
+                    if (playerId > 0)
                     {
-                        Random rnd = new Random();
-                        var newPlayer = new Player()
+                        // let's test that the player id is actually a user in the database since we could have an ID in config but not in the database. 
+                        var playerInDatabase = db.Player
+                        .Where(x => x.Id == playerId)
+                        .FirstOrDefault();
+
+                        // if the player id isn't found in the database throw exception. 
+                        if (playerInDatabase == null)
+                            throw new Exception("PlayerId: " + playerId + " was deemed logged in but player was not found in the database. Please check id exists.");
+
+                        // let's make sure the player it found wasn't the unknown player for whatever reason. 
+                        if (playerId != 999 && playerId > 0)
                         {
-                            Name = playerEntry.Key,
-                            IpAddress = rnd.Next(0, 250) + "." + rnd.Next(0, 250) + "." + rnd.Next(0, 250) + "." + rnd.Next(0, 250),
-                            Password = "pw",
-                            UserName = "uname"
-                        };
-                        db.Player.Add(newPlayer);
-                        db.SaveChanges();
-                        playerId = newPlayer.Id;
+                            // populate team stats
+                            mpStats.KillEfficiency = playerEntry.Value.KillEfficiency.ConvertEfficiency();
+                            mpStats.WeaponEfficiency = playerEntry.Value.WeaponEfficiency.ConvertEfficiency();
+                            // populate quad stats
+                            mpStats.NumberOfQuads = playerEntry.Value.NumberOfQuads.ConvertToInt();
+                            mpStats.QuadEfficiency = playerEntry.Value.QuadEfficiency.ConvertEfficiency();
+                            mpStats.NumQuadEnemyKills = playerEntry.Value.NumQuadEnemyKills.ConvertToInt();
+                            mpStats.NumQuadSelfKills = playerEntry.Value.NumQuadSelfKills.ConvertToInt();
+                            mpStats.NumQuadTeamKills = playerEntry.Value.NumQuadTeamKills.ConvertToInt();
+                            // populate kill stats
+                            mpStats.NumOfFrags = playerEntry.Value.NumOfFrags.ConvertToInt();
+                            mpStats.NumOfEnemyKills = playerEntry.Value.NumOfEnemyKills.ConvertToInt();
+                            mpStats.NumOfSelfKills = playerEntry.Value.NumOfSelfKills.ConvertToInt();
+                            mpStats.NumOfTeamKills = playerEntry.Value.NumOfTeamKills.ConvertToInt();
+                            mpStats.NumOfDeaths = playerEntry.Value.NumOfDeaths.ConvertToInt();
+                            // populate efficiency stats
+                            mpStats.BulletEfficiency = playerEntry.Value.BulletEfficiency.ConvertEfficiency();
+                            mpStats.NailsEfficiency = playerEntry.Value.NailsEfficiency.ConvertEfficiency();
+                            mpStats.RocketEfficiency = playerEntry.Value.RocketEfficiency.ConvertEfficiency();
+                            mpStats.LightningEfficiency = playerEntry.Value.LightningEfficiency.ConvertEfficiency();
+                            mpStats.TotalEfficiency = playerEntry.Value.TotalEfficiency.ConvertEfficiency();
+                            // populate bad stats
+                            mpStats.DroppedPaks = playerEntry.Value.DroppedPaks.ConvertToInt();
+                            mpStats.SelfDamage = playerEntry.Value.SelfDamage.ConvertEfficiency();
+                            mpStats.TeamDamage = playerEntry.Value.TeamDamage.ConvertEfficiency();
+                        }
+                        else
+                            throw new Exception("Some how the query for playerId: " + playerId + " came back as 999");
                     }
                     else
-                        playerId = playa.Id;
+                        // set id to unknown player
+                        playerId = 999;
 
-                    var mpStats = new MatchPlayerStats();
+                    // Tracking Info
                     mpStats.MatchId = match.Id;
                     mpStats.PlayerId = playerId;
-                    // populate team stats
                     mpStats.TeamColor = playerEntry.Value.TeamColor;
-                    mpStats.KillEfficiency = playerEntry.Value.KillEfficiency.ConvertEfficiency();
-                    mpStats.WeaponEfficiency = playerEntry.Value.WeaponEfficiency.ConvertEfficiency();
-                    // populate quad stats
-                    mpStats.NumberOfQuads = playerEntry.Value.NumberOfQuads.ConvertToInt();
-                    mpStats.QuadEfficiency = playerEntry.Value.QuadEfficiency.ConvertEfficiency();
-                    mpStats.NumQuadEnemyKills = playerEntry.Value.NumQuadEnemyKills.ConvertToInt();
-                    mpStats.NumQuadSelfKills = playerEntry.Value.NumQuadSelfKills.ConvertToInt();
-                    mpStats.NumQuadTeamKills = playerEntry.Value.NumQuadTeamKills.ConvertToInt();
-                    // populate kill stats
-                    mpStats.NumOfFrags = playerEntry.Value.NumOfFrags.ConvertToInt();
-                    mpStats.NumOfEnemyKills = playerEntry.Value.NumOfEnemyKills.ConvertToInt();
-                    mpStats.NumOfSelfKills = playerEntry.Value.NumOfSelfKills.ConvertToInt();
-                    mpStats.NumOfTeamKills = playerEntry.Value.NumOfTeamKills.ConvertToInt();
-                    mpStats.NumOfDeaths = playerEntry.Value.NumOfDeaths.ConvertToInt();
-                    // populate efficiency stats
-                    mpStats.BulletEfficiency = playerEntry.Value.BulletEfficiency.ConvertEfficiency();
-                    mpStats.NailsEfficiency = playerEntry.Value.NailsEfficiency.ConvertEfficiency();
-                    mpStats.RocketEfficiency = playerEntry.Value.RocketEfficiency.ConvertEfficiency();
-                    mpStats.LightningEfficiency = playerEntry.Value.LightningEfficiency.ConvertEfficiency();
-                    mpStats.TotalEfficiency = playerEntry.Value.TotalEfficiency.ConvertEfficiency();
-                    // populate bad stats
-                    mpStats.DroppedPaks = playerEntry.Value.DroppedPaks.ConvertToInt();
-                    mpStats.SelfDamage = playerEntry.Value.SelfDamage.ConvertEfficiency();
-                    mpStats.TeamDamage = playerEntry.Value.TeamDamage.ConvertEfficiency();
-
                     db.MatchPlayerStats.Add(mpStats);
                     db.SaveChanges();
                 }

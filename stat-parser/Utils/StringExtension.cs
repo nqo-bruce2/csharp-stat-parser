@@ -10,6 +10,9 @@ namespace Utils
     {
         public static decimal? ConvertEfficiency(this string str)
         {
+            if (str == null)
+                return null;
+
             if (str.Equals("N/A"))
                 return null;
 
@@ -26,6 +29,8 @@ namespace Utils
 
         public static int ConvertToInt(this string str)
         {
+            if (String.IsNullOrEmpty(str) || String.IsNullOrWhiteSpace(str))
+                str = "0";
             int convertedValue;
             int.TryParse(str.Trim(), out convertedValue);
             return convertedValue;

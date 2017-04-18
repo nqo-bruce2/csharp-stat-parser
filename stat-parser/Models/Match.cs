@@ -12,6 +12,7 @@ namespace Models
         public string MatchId { get; set; }
         public string MatchType { get; set; }
         public string MapName { get; set; }
+        public int MatchTimeLimit { get; set; }
         public DateTime Date { get; set; }
         public string MatchText { get; set; }
     }

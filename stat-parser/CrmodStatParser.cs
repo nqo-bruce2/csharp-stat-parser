@@ -208,6 +208,7 @@ namespace stat_parser
         internal override void ProcessPlayerStats()
         {
             logger.Info("Beginning to parse Player Stats");
+
             // this var will be used to create unique guest ids that we'll then default to 999 at db entry
             var guestOrNotLoggedInStatId = 0;
 
@@ -250,7 +251,10 @@ namespace stat_parser
                 // add players to list of players
                 // if statid is 0 set it to less than 0 as we'll default this to UnknownPlayerId 999
                 if (p.StatId.Equals("0"))
-                    p.StatId = (guestOrNotLoggedInStatId - 1).ToString();
+                {
+                    guestOrNotLoggedInStatId -= 1;
+                    p.StatId = (guestOrNotLoggedInStatId).ToString();
+                }                    
                 MatchResults.ListOfPlayers.Add(p.StatId, p);
             }
             logger.Info("End parsing player stats");

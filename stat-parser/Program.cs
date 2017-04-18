@@ -4,7 +4,7 @@ using NLog;
 using System.Configuration;
 using Integration;
 using System.Linq;
-
+using System.Threading;
 
 namespace stat_parser
 {
@@ -54,8 +54,14 @@ namespace stat_parser
             watcher.EnableRaisingEvents = true;
 
             // Wait for the user to quit the program.
-            Console.WriteLine("Press \'q\' to quit the sample.");
-            while (Console.Read() != 'q') ;
+            /* Original code
+             * Console.WriteLine("Press \'q\' to quit the sample.");
+            while (Console.Read() != 'q')
+            {
+                Thread.Sleep(1000);
+            }
+            */
+            while (true) { Thread.Sleep(1000); }
         }
 
         // Define the event handlers.

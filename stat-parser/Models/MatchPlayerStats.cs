@@ -9,6 +9,8 @@ namespace Models
         public int Id { get; set; }
         public int MatchId { get; set; }
         public int PlayerId { get; set; }
+        public int Ping { get; set; }
+        public string IpAddress { get; set; }
         // begin skill stats
         public string TeamColor { get; set; }
         public decimal? KillEfficiency { get; set; }
